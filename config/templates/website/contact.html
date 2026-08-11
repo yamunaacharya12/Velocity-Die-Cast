@@ -1,0 +1,33 @@
+{% extends 'website/layout.html' %}
+{% block title %}Contact Us — Velocity Die-Cast{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="hw-crumb"><a href="{% url 'home' %}">Home</a><span class="sep">/</span><span class="cur">Contact Us</span></div>
+  <h1 class="hw-page-title">Contact Us</h1>
+  <div class="row g-5">
+    <div class="col-lg-5">
+      <p style="color:var(--silver);">Our support team responds within 24 hours, seven days a week.</p>
+      <p style="color:var(--silver); line-height:2;">
+        <b style="color:var(--white);">Email:</b> support@velocitydiecast.com<br>
+        <b style="color:var(--white);">Phone:</b> +1 (800) 555-0142<br>
+        <b style="color:var(--white);">Hours:</b> Mon&ndash;Sat, 9AM&ndash;7PM (GMT+5:45)
+      </p>
+    </div>
+    <div class="col-lg-7">
+      <div class="hw-form-section">
+        <h4>Send a Message</h4>
+        <form method="post">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-md-6 hw-field"><label>Name</label><input name="name" required placeholder="Your name"></div>
+            <div class="col-md-6 hw-field"><label>Email</label><input type="email" name="email" required placeholder="you@email.com"></div>
+          </div>
+          <div class="hw-field mt-3"><label>Subject</label><input name="subject" placeholder="How can we help?"></div>
+          <div class="hw-field mt-3"><label>Message</label><textarea name="message" rows="4" required placeholder="Tell us more..."></textarea></div>
+          <button type="submit" class="hw-btn hw-btn-primary hw-btn-sm mt-3">Send Message</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

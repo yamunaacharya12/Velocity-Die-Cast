@@ -1,0 +1,206 @@
+{% extends 'website/layout.html' %}
+{% load product_extras %}
+{% block title %}{{ product.name }} — Velocity Die-Cast{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="hw-crumb">
+    <a href="{% url 'home' %}">Home</a><span class="sep">/</span>
+    <a href="{{ product.category.get_absolute_url }}">{{ product.category.name }}</a><span class="sep">/</span>
+    <span class="cur">{{ product.name }}</span>
+  </div>
+
+  <div class="row g-5">
+    <div class="col-lg-6">
+      <div class="hw-pd-gallery-main" id="pdMain">
+        {% if product.image %}
+          <img src="{{ product.image.url }}" alt="{{ product.name }}">
+        {% else %}
+          {% car_svg product 0 %}
+        {% endif %}
+      </div>
+      <div class="hw-pd-thumbs">
+        {% if product.gallery_images.all %}
+          {% for img in product.gallery_images.all %}
+            <div class="hw-pd-thumb {% if forloop.first %}active{% endif %}" onclick="setMain(this, '{{ img.image.url }}', false)"><img src="{{ img.image.url }}" alt=""></div>
+          {% endfor %}
+        {% else %}
+          {% for i in "0123" %}
+            <div class="hw-pd-thumb {% if forloop.first %}active{% endif %}" onclick="setAngle(this, {{ forloop.counter0 }})">{% car_svg product forloop.counter0 %}</div>
+          {% endfor %}
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      <div class="hw-pd-brand">{{ product.brand.name }}</div>
+      <h1 class="hw-pd-title">{{ product.name }}</h1>
+      <div class="hw-pd-rating-row">
+        <span class="hw-stars">{% for s in product.average_rating|star_range %}&#9733;{% endfor %}{% for s in product.average_rating|empty_star_range %}&#9734;{% endfor %}</span>
+        <span>{{ product.average_rating }} out of 5 &middot; {{ product.review_count }} review{{ product.review_count|pluralize }}</span>
+        <span>&middot;</span>
+        {% if product.stock_status == 'out' %}<span class="hw-stock-out">Out of Stock</span>
+        {% elif product.stock_status == 'low' %}<span class="hw-stock-low">Only {{ product.stock }} left in stock</span>
+        {% else %}<span class="hw-stock-ok">In Stock &mdash; Ships in 1&ndash;2 Days</span>{% endif %}
+      </div>
+      <div class="hw-pd-price-row">
+        <span class="hw-pd-price">${{ product.price }}</span>
+        {% if product.old_price %}<span class="hw-price-old" style="font-size:16px;">${{ product.old_price }}</span>{% endif %}
+      </div>
+      <p class="hw-pd-desc">{{ product.description }}</p>
+
+      <table class="hw-pd-specs-table">
+        <tr><td>Scale</td><td>{{ product.scale }}</td></tr>
+        <tr><td>Material</td><td>{{ product.material }}</td></tr>
+        <tr><td>Dimensions</td><td>{{ product.dimensions|default:"—" }}</td></tr>
+        <tr><td>Color</td><td>{{ product.color|default:"—" }}</td></tr>
+        <tr><td>Release Year</td><td>{{ product.release_year }}</td></tr>
+        <tr><td>Recommended Age</td><td>{{ product.recommended_age }}+ years</td></tr>
+        <tr><td>Manufacturer</td><td>{{ product.manufacturer }}</td></tr>
+      </table>
+
+      <form method="post" action="{% url 'add_to_cart' product.id %}" class="mb-3">
+        {% csrf_token %}
+        <div class="d-flex align-items-center gap-3 mb-3 flex-wrap">
+          <div class="hw-qty-stepper">
+            <button type="button" onclick="stepQty(-1)">&minus;</button>
+            <input type="number" name="quantity" value="1" min="1" max="{{ product.stock }}" class="hw-qty-val" id="qtyInput">
+            <button type="button" onclick="stepQty(1)">+</button>
+          </div>
+          <span style="font-size:12px;color:var(--silver-dim);">{{ product.stock }} units available</span>
+        </div>
+        <div class="d-flex gap-3 flex-wrap mb-4">
+          <button type="submit" class="hw-btn hw-btn-outline" {% if product.stock_status == 'out' %}disabled{% endif %}>Add to Cart</button>
+          <button type="submit" formaction="{% url 'buy_now' product.id %}" class="hw-btn hw-btn-primary" {% if product.stock_status == 'out' %}disabled{% endif %}>Buy Now</button>
+          {% if user.is_authenticated %}
+            <button type="submit" formaction="{% url 'wishlist_toggle' product.id %}" formnovalidate class="hw-btn hw-btn-dark">
+              {% if in_wishlist %}&#9829; Wishlisted{% else %}&#9825; Add to Wishlist{% endif %}
+            </button>
+          {% endif %}
+        </div>
+      </form>
+
+      <ul class="hw-features">
+        {% for f in product.feature_list %}
+          <li><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>{{ f }}</li>
+        {% endfor %}
+      </ul>
+
+      <div class="hw-trust-row">
+        <div class="hw-trust-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4M12 21c-4-2-8-6-8-11a8 8 0 0 1 16 0c0 5-4 9-8 11z"/></svg>Authenticity Guaranteed</div>
+        <div class="hw-trust-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20z"/></svg>Worldwide Shipping</div>
+        <div class="hw-trust-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v6h6"/></svg>30-Day Returns</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hw-tabs">
+    <button class="hw-tab-btn active" onclick="switchTab('desc', this)">Description</button>
+    <button class="hw-tab-btn" onclick="switchTab('specs', this)">Specifications</button>
+    <button class="hw-tab-btn" onclick="switchTab('reviews', this)">Reviews ({{ product.review_count }})</button>
+  </div>
+
+  <div class="hw-tab-panel active" id="tab-desc">
+    <p>{{ product.description }}</p>
+    <p style="margin-top:14px;">Every Velocity release begins as a full CAD scan of the source vehicle, refined across six tooling revisions before casting in zinc-alloy die-cast metal. Panel lines, badges, and undercarriage details are reproduced at scale, then hand-inspected before packaging.</p>
+  </div>
+
+  <div class="hw-tab-panel" id="tab-specs">
+    <table class="hw-pd-specs-table">
+      <tr><td>Brand</td><td>{{ product.brand.name }}</td></tr>
+      <tr><td>Category</td><td>{{ product.category.name }}</td></tr>
+      <tr><td>Scale</td><td>{{ product.scale }}</td></tr>
+      <tr><td>Material</td><td>{{ product.material }}</td></tr>
+      <tr><td>Dimensions</td><td>{{ product.dimensions|default:"—" }}</td></tr>
+      <tr><td>Color</td><td>{{ product.color|default:"—" }}</td></tr>
+      <tr><td>Release Year</td><td>{{ product.release_year }}</td></tr>
+      <tr><td>Recommended Age</td><td>{{ product.recommended_age }}+ years</td></tr>
+      <tr><td>Manufacturer</td><td>{{ product.manufacturer }}</td></tr>
+      <tr><td>SKU</td><td>{{ product.sku }}</td></tr>
+    </table>
+  </div>
+
+  <div class="hw-tab-panel" id="tab-reviews">
+    <div class="d-flex align-items-center gap-4 mb-4">
+      <div style="font-family:'Teko';font-size:52px;color:var(--white);">{{ product.average_rating }}</div>
+      <div>
+        <div class="hw-stars" style="font-size:18px;">{% for s in product.average_rating|star_range %}&#9733;{% endfor %}{% for s in product.average_rating|empty_star_range %}&#9734;{% endfor %}</div>
+        <div style="color:var(--silver-dim);font-size:12.5px;">Based on {{ product.review_count }} verified review{{ product.review_count|pluralize }}</div>
+      </div>
+    </div>
+
+    {% for review in reviews %}
+      <div class="hw-review-item">
+        <div class="d-flex justify-content-between">
+          <b style="color:var(--white);">{{ review.name }}</b>
+          <span style="color:var(--silver-dim);font-size:12px;">{{ review.created_at|date:"M d, Y" }}</span>
+        </div>
+        <div class="hw-stars" style="margin:6px 0;">{% for s in review.rating|star_range %}&#9733;{% endfor %}{% for s in review.rating|empty_star_range %}&#9734;{% endfor %}</div>
+        <p style="color:var(--silver);">{{ review.comment }}</p>
+      </div>
+    {% empty %}
+      <p style="color:var(--silver-dim);">No reviews yet — be the first to share your thoughts.</p>
+    {% endfor %}
+
+    <div class="hw-form-section mt-4">
+      <h4>Write a Review</h4>
+      {% if user.is_authenticated %}
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="form_type" value="review">
+          <div class="hw-field mb-3">
+            <label>Rating</label>
+            <select name="rating" style="max-width:120px;">
+              <option value="5">5 — Excellent</option>
+              <option value="4">4 — Great</option>
+              <option value="3">3 — Good</option>
+              <option value="2">2 — Fair</option>
+              <option value="1">1 — Poor</option>
+            </select>
+          </div>
+          <div class="hw-field mb-3">
+            <label>Your Review</label>
+            <textarea name="comment" rows="3" required placeholder="Share your thoughts on this model..."></textarea>
+          </div>
+          <button type="submit" class="hw-btn hw-btn-primary hw-btn-sm">Post Review</button>
+        </form>
+      {% else %}
+        <p style="color:var(--silver-dim); font-size:13.5px;"><a href="{% url 'login' %}?next={{ request.path }}" style="color:var(--red);">Sign in</a> to leave a review.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="hw-section-head mt-5"><div><div class="hw-eyebrow">You Might Also Like</div><h2>Related Models</h2></div></div>
+  <div class="row g-4 pb-5">
+    {% for p in related %}
+      <div class="col-lg-3 col-md-6">
+        {% with product=p %}{% include 'website/_product_card.html' %}{% endwith %}
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<script>
+function switchTab(name, btn){
+  document.querySelectorAll('.hw-tab-btn').forEach(function(b){b.classList.remove('active');});
+  document.querySelectorAll('.hw-tab-panel').forEach(function(t){t.classList.remove('active');});
+  btn.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+}
+function stepQty(d){
+  var el = document.getElementById('qtyInput');
+  var v = Math.max(1, parseInt(el.value||1) + d);
+  el.value = v;
+}
+function setMain(el, url, isSvg){
+  document.querySelectorAll('.hw-pd-thumb').forEach(function(t){t.classList.remove('active');});
+  el.classList.add('active');
+  document.getElementById('pdMain').innerHTML = '<img src="'+url+'" alt="">';
+}
+function setAngle(el, idx){
+  document.querySelectorAll('.hw-pd-thumb').forEach(function(t){t.classList.remove('active');});
+  el.classList.add('active');
+  document.getElementById('pdMain').innerHTML = el.innerHTML;
+}
+</script>
+{% endblock %}

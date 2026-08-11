@@ -1,0 +1,17 @@
+{% extends 'website/layout.html' %}
+{% block title %}Shipping Information — Velocity Die-Cast{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="hw-crumb"><a href="{% url 'home' %}">Home</a><span class="sep">/</span><span class="cur">Shipping Information</span></div>
+  <div class="hw-info-page" style="max-width:820px;">
+    <h1 class="hw-page-title">Shipping Information</h1>
+    <p>We ship worldwide from our fulfillment centers via tracked courier. Orders placed before 2PM local time ship the same business day.</p>
+    <h3>Standard Shipping</h3>
+    <p>3&ndash;7 business days domestic, 7&ndash;14 business days international. Free on orders over $100.</p>
+    <h3>Express Shipping</h3>
+    <p>1&ndash;3 business days domestic, flat rate $19.99.</p>
+    <h3>Packaging</h3>
+    <p>Every model ships in a rigid protective mailer with internal foam bracing to prevent shifting or paint damage in transit.</p>
+  </div>
+</div>
+{% endblock %}

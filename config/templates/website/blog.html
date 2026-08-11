@@ -1,0 +1,27 @@
+{% extends 'website/layout.html' %}
+{% load product_extras %}
+{% block title %}The Velocity Journal — Velocity Die-Cast{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="hw-crumb"><a href="{% url 'home' %}">Home</a><span class="sep">/</span><span class="cur">Blog</span></div>
+  <h1 class="hw-page-title">The Velocity Journal</h1>
+  <p style="color:var(--silver-dim); max-width:600px; margin-bottom:32px;">Stories from the garage — restoration deep-dives, tooling behind-the-scenes, and collector spotlights.</p>
+  <div class="row g-4">
+    {% for post in posts %}
+      <div class="col-md-4">
+        <a href="{% url 'blog_detail' post.slug %}" class="hw-blog-card d-block">
+          <div class="hw-blog-cover" style="background:linear-gradient(120deg, {{ post.accent_color }}22, var(--charcoal-2));">
+            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="{{ post.accent_color }}" stroke-width="1.4"><path d="M4 18h16M6 18l3-9h6l3 9"/><circle cx="8.5" cy="18" r="1.6"/><circle cx="15.5" cy="18" r="1.6"/></svg>
+          </div>
+          <div class="hw-blog-body">
+            <h3>{{ post.title }}</h3>
+            <p>{{ post.excerpt }}</p>
+          </div>
+        </a>
+      </div>
+    {% empty %}
+      <p style="color:var(--silver-dim);">No posts yet — check back soon.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

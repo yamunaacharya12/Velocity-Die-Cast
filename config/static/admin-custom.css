@@ -1,0 +1,46 @@
+/* ==========================================================================
+   Velocity Die-Cast admin theme
+   Restyles the default Django admin to match the storefront's dark palette.
+   Structure and behavior are untouched — only colors, type, and spacing.
+   ========================================================================== */
+:root{
+    --admin-black:#0a0a0c;
+    --admin-charcoal:#141419;
+    --admin-charcoal-2:#1c1d24;
+    --admin-line:#2c2d36;
+    --admin-red:#e4002b;
+    --admin-silver:#cfd3d9;
+}
+
+body{
+    background: var(--admin-charcoal) !important;
+    color: var(--admin-silver) !important;
+}
+
+#header{
+    background: var(--admin-black) !important;
+    color: #fff !important;
+    padding: 16px 40px;
+    border-bottom: 1px solid var(--admin-line);
+}
+#header a:link, #header a:visited{ color: #fff !important; }
+#branding h1, #branding h1 a{ color: #fff !important; font-weight: 700 !important; }
+div.breadcrumbs{ background: var(--admin-charcoal-2) !important; color: var(--admin-silver) !important; border-bottom: 1px solid var(--admin-line); }
+div.breadcrumbs a{ color: var(--admin-silver) !important; }
+
+.module{ background: var(--admin-charcoal) !important; border: 1px solid var(--admin-line) !important; }
+.module h2, .module caption, .inline-group h2{ background: var(--admin-charcoal-2) !important; color: #fff !important; }
+
+a:link, a:visited{ color: #ff6b83; }
+.button, input[type=submit], input[type=button], .submit-row input, a.button{
+    background: var(--admin-red) !important; color:#fff !important; border: none !important;
+}
+.button:hover, input[type=submit]:hover{ background:#ff1439 !important; }
+
+#content-related, .object-tools a{ background: var(--admin-charcoal) !important; }
+table thead th{ background: var(--admin-charcoal-2) !important; color: #fff !important; }
+table tbody tr{ background: var(--admin-charcoal) !important; }
+table tbody tr:nth-child(even){ background: var(--admin-charcoal-2) !important; }
+input, select, textarea{ background: var(--admin-charcoal-2) !important; color: #fff !important; border: 1px solid var(--admin-line) !important; }
+
+.selector-chosen h2, .selector-available h2{ background: var(--admin-charcoal-2) !important; color: #fff !important; }

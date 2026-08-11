@@ -1,0 +1,53 @@
+{% load product_extras %}
+<div class="hw-card">
+  <div class="hw-card-media">
+    <a href="{{ product.get_absolute_url }}" style="display:block; width:100%; height:100%;">
+      {% if product.tag %}
+        <div class="hw-card-tag hw-tag-{{ product.tag }}">
+          {% if product.tag == 'new' %}New{% elif product.tag == 'best' %}Bestseller{% elif product.tag == 'limited' %}Limited{% elif product.tag == 'sale' %}Sale{% endif %}
+        </div>
+      {% endif %}
+      <div class="hw-scale-stamp"><span>SCALE</span><b>{{ product.scale }}</b></div>
+      {% if product.image %}
+        <img src="{{ product.image.url }}" alt="{{ product.name }}">
+      {% else %}
+        {% car_svg product 0 %}
+      {% endif %}
+    </a>
+    {% if user.is_authenticated %}
+      <form method="post" action="{% url 'wishlist_toggle' product.id %}" style="position:absolute; bottom:10px; right:10px; margin:0;">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.path }}">
+        <button type="submit" class="hw-wish-btn {% if product.id in wishlisted_ids %}active{% endif %}">
+          <svg viewBox="0 0 24 24" fill="{% if product.id in wishlisted_ids %}currentColor{% else %}none{% endif %}" stroke="currentColor" stroke-width="2"><path d="M12 21s-7.5-4.9-10-9.4C.4 8 2 4 6 4c2.2 0 3.8 1.3 6 4 2.2-2.7 3.8-4 6-4 4 0 5.6 4 4 7.6C19.5 16.1 12 21 12 21z"/></svg>
+        </button>
+      </form>
+    {% endif %}
+  </div>
+  <div class="hw-card-body">
+    <div class="hw-card-brand">{{ product.brand.name }}</div>
+    <a href="{{ product.get_absolute_url }}" class="hw-card-title" style="display:block;">{{ product.name }}</a>
+    <div class="hw-card-specs"><span>{{ product.scale }}</span><span>{{ product.material }}</span></div>
+    <div class="hw-card-rating">
+      <span class="hw-stars">{% for s in product.average_rating|star_range %}&#9733;{% endfor %}{% for s in product.average_rating|empty_star_range %}&#9734;{% endfor %}</span>
+      <span>{{ product.average_rating }} ({{ product.review_count }})</span>
+    </div>
+    <div class="hw-card-foot">
+      <div class="hw-price-block">
+        {% if product.old_price %}<span class="hw-price-old">${{ product.old_price }}</span>{% endif %}
+        <span class="hw-price">${{ product.price }}</span>
+      </div>
+      {% if product.stock_status == 'out' %}<span class="hw-stock-out">Out of Stock</span>
+      {% elif product.stock_status == 'low' %}<span class="hw-stock-low">Only {{ product.stock }} left</span>
+      {% else %}<span class="hw-stock-ok">In Stock</span>{% endif %}
+    </div>
+  </div>
+  <div class="hw-card-actions">
+    <a href="{{ product.get_absolute_url }}" class="hw-btn hw-btn-outline">View Details</a>
+    <form method="post" action="{% url 'add_to_cart' product.id %}" style="flex:1; margin:0;">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ request.path }}">
+      <button type="submit" class="hw-btn hw-btn-primary" style="width:100%;" {% if product.stock_status == 'out' %}disabled{% endif %}>Add to Cart</button>
+    </form>
+  </div>
+</div>

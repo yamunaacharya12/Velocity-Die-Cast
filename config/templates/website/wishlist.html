@@ -1,0 +1,25 @@
+{% extends 'website/layout.html' %}
+{% block title %}Your Wishlist — Velocity Die-Cast{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="hw-crumb"><a href="{% url 'home' %}">Home</a><span class="sep">/</span><span class="cur">Wishlist</span></div>
+  <h1 class="hw-page-title">Your Wishlist</h1>
+
+  {% if not items %}
+    <div class="hw-empty-state">
+      <p style="font-family:'Teko';font-size:26px;color:var(--white);">No favorites yet</p>
+      <p style="margin:10px 0 20px;">Tap the heart icon on any model to save it here.</p>
+      <a href="{% url 'shop' %}" class="hw-btn hw-btn-primary">Browse Models</a>
+    </div>
+  {% else %}
+    <div class="row g-4">
+      {% for item in items %}
+        <div class="col-lg-3 col-md-6">
+          {% with product=item.product %}{% include 'website/_product_card.html' %}{% endwith %}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

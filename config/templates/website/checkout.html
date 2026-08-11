@@ -1,0 +1,106 @@
+{% extends 'website/layout.html' %}
+{% load product_extras %}
+{% block title %}Checkout — Velocity Die-Cast{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="hw-crumb"><a href="{% url 'home' %}">Home</a><span class="sep">/</span><a href="{% url 'cart' %}">Cart</a><span class="sep">/</span><span class="cur">Checkout</span></div>
+  <h1 class="hw-page-title">Checkout</h1>
+
+  <form method="post">
+    {% csrf_token %}
+    <div class="row g-4">
+      <div class="col-lg-8">
+        <div class="hw-form-section">
+          <h4><span class="num">1</span>Customer Information</h4>
+          <div class="row g-3">
+            <div class="col-md-6 hw-field"><label>Full Name *</label><input name="full_name" required value="{{ request.user.get_full_name }}" placeholder="Alex Rivera"></div>
+            <div class="col-md-6 hw-field"><label>Email Address *</label><input type="email" name="email" required value="{{ request.user.email }}" placeholder="alex@email.com"></div>
+          </div>
+          <div class="hw-field mt-3"><label>Phone Number *</label><input name="phone" required placeholder="+977 98XXXXXXXX"></div>
+        </div>
+
+        <div class="hw-form-section">
+          <h4><span class="num">2</span>Shipping Address</h4>
+          <div class="hw-field"><label>Street Address *</label><input name="address" required placeholder="House 12, Baneshwor Marg"></div>
+          <div class="row g-3 mt-1">
+            <div class="col-md-6 hw-field"><label>City *</label><input name="city" required placeholder="Kathmandu"></div>
+            <div class="col-md-6 hw-field"><label>State / Province</label><input name="state" placeholder="Bagmati"></div>
+          </div>
+          <div class="row g-3 mt-1">
+            <div class="col-md-6 hw-field"><label>ZIP / Postal Code</label><input name="zip_code" placeholder="44600"></div>
+            <div class="col-md-6 hw-field">
+              <label>Country</label>
+              <select name="country">
+                <option>Nepal</option><option>United States</option><option>United Kingdom</option><option>India</option><option>Australia</option><option>Other</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="hw-form-section">
+          <h4><span class="num">3</span>Payment Method</h4>
+          <div class="row g-3">
+            {% for value, label in payment_choices %}
+              <div class="col-md-6">
+                <label class="hw-pay-opt {% if forloop.first %}selected{% endif %}">
+                  <input type="radio" name="payment_method" value="{{ value }}" {% if forloop.first %}checked{% endif %} onchange="selectPay(this)">
+                  <div class="hw-pay-opt-label">
+                    <b>{{ label }}</b>
+                    <span>
+                      {% if value == 'card' %}Visa, Mastercard, Amex
+                      {% elif value == 'paypal' %}Pay securely via PayPal
+                      {% elif value == 'esewa' %}Nepal digital wallet
+                      {% elif value == 'khalti' %}Nepal digital wallet
+                      {% elif value == 'fonepay' %}QR / bank transfer
+                      {% elif value == 'cod' %}Pay when it arrives{% endif %}
+                    </span>
+                  </div>
+                </label>
+              </div>
+            {% endfor %}
+          </div>
+          <div id="cardFields" class="mt-3" style="display:none; padding-top:16px; border-top:1px dashed var(--line);">
+            <div class="row g-3">
+              <div class="col-12 hw-field"><label>Card Number</label><input placeholder="4242 4242 4242 4242"></div>
+              <div class="col-md-6 hw-field"><label>Expiry</label><input placeholder="MM / YY"></div>
+              <div class="col-md-6 hw-field"><label>CVC</label><input placeholder="123"></div>
+            </div>
+            <p style="font-size:11px;color:var(--silver-dim);margin-top:8px;">Demo checkout — no real charge is made.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="hw-summary-box">
+          <h4 style="font-family:'Teko';font-size:20px;margin-bottom:18px;">Order Summary</h4>
+          <div style="max-height:220px; overflow:auto; margin-bottom:16px;">
+            {% for item in cart_items %}
+              <div class="d-flex justify-content-between" style="font-size:12.5px;color:var(--silver);padding:6px 0;">
+                <span>{{ item.product.name }} &times; {{ item.quantity }}</span><span>${{ item.total }}</span>
+              </div>
+            {% endfor %}
+          </div>
+          <div class="hw-summary-row"><span>Subtotal</span><span>${{ subtotal }}</span></div>
+          <div class="hw-summary-row"><span>Shipping</span><span>{% if shipping == 0 %}FREE{% else %}${{ shipping }}{% endif %}</span></div>
+          <div class="hw-summary-row"><span>Estimated Tax</span><span>${{ tax }}</span></div>
+          <div class="hw-summary-row total"><span>Total</span><span>${{ total }}</span></div>
+          <button type="submit" class="hw-btn hw-btn-primary hw-btn-block mt-3">Place Secure Order &rarr;</button>
+          <div class="hw-trust-item mt-3" style="justify-content:center;">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="10" rx="1"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+            256-bit SSL Secured Checkout
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<script>
+function selectPay(input){
+  document.querySelectorAll('.hw-pay-opt').forEach(function(el){el.classList.remove('selected');});
+  input.closest('.hw-pay-opt').classList.add('selected');
+  document.getElementById('cardFields').style.display = input.value === 'card' ? 'block' : 'none';
+}
+</script>
+{% endblock %}

@@ -1,0 +1,141 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>{% block title %}Velocity Die-Cast — Premium Collector Cars{% endblock %}</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'style.css' %}">
+{% block css %}{% endblock %}
+</head>
+<body>
+
+<div class="hw-topbar">
+  <div class="container d-flex justify-content-between flex-wrap">
+    <div>FREE WORLDWIDE SHIPPING ON ORDERS OVER <span class="hl">$100</span></div>
+    <div><a href="{% url 'track_order' %}" class="hl">TRACK ORDER</a>&nbsp; | &nbsp;<a href="{% url 'help' %}">HELP CENTER</a>&nbsp; | &nbsp;EN / USD</div>
+  </div>
+</div>
+
+<nav class="navbar navbar-expand-lg hw-navbar sticky-top">
+  <div class="container">
+    <a class="navbar-brand hw-logo" href="{% url 'home' %}">
+      <svg width="34" height="34" viewBox="0 0 40 40"><circle cx="20" cy="20" r="19" fill="none" stroke="#e4002b" stroke-width="2"/><path d="M8 24 L14 15 L26 15 L32 24 Z" fill="none" stroke="#f4f5f6" stroke-width="2" stroke-linejoin="round"/><circle cx="15" cy="25" r="3" fill="#f4f5f6"/><circle cx="25" cy="25" r="3" fill="#f4f5f6"/></svg>
+      <div>
+        <div class="hw-logo-text">VELOCITY<b>.</b></div>
+        <div class="hw-logo-sub">Die-Cast Collector Garage</div>
+      </div>
+    </a>
+    <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar" style="border-color:var(--line);">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbar">
+      <ul class="navbar-nav ms-auto align-items-lg-center">
+        <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'home' %}">Home</a></li>
+        <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'shop' %}active{% endif %}" href="{% url 'shop' %}">Shop</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'shop' %}?sort=new">New Arrivals</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'shop' %}?sort=best">Best Sellers</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'shop' %}?sort=sale">Offers</a></li>
+        <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}" href="{% url 'about' %}">About</a></li>
+        <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'contact' %}active{% endif %}" href="{% url 'contact' %}">Contact</a></li>
+        <li class="nav-item ms-lg-3 mt-3 mt-lg-0">
+          <div class="hw-navicons">
+            <form action="{% url 'shop' %}" method="get" class="hw-search-mini d-none d-xl-flex">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--silver-dim);"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+              <input type="text" name="q" placeholder="Search models...">
+            </form>
+            {% if user.is_authenticated %}
+              <a href="{% url 'dashboard' %}" title="Account"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></a>
+            {% else %}
+              <a href="{% url 'login' %}" title="Sign In"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></a>
+            {% endif %}
+            <a href="{% url 'wishlist' %}" title="Wishlist"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 21s-7.5-4.9-10-9.4C.4 8 2 4 6 4c2.2 0 3.8 1.3 6 4 2.2-2.7 3.8-4 6-4 4 0 5.6 4 4 7.6C19.5 16.1 12 21 12 21z"/></svg></a>
+            <a href="{% url 'cart' %}" title="Cart">
+              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/></svg>
+              <span class="hw-badge-count">{{ cart_count|default:0 }}</span>
+            </a>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+{% if messages %}
+<div class="container pt-3">
+  {% for message in messages %}
+    <div class="hw-alert {% if message.tags == 'success' %}hw-alert-success{% elif message.tags == 'error' %}hw-alert-error{% else %}hw-alert-info{% endif %}">
+      <span>{{ message }}</span>
+    </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<main>
+  {% block content %}{% endblock %}
+</main>
+
+<footer class="hw-footer">
+  <div class="container">
+    <div class="row gy-4 pb-5">
+      <div class="col-lg-4 col-md-6">
+        <div class="hw-logo mb-2">
+          <svg width="34" height="34" viewBox="0 0 40 40"><circle cx="20" cy="20" r="19" fill="none" stroke="#e4002b" stroke-width="2"/><path d="M8 24 L14 15 L26 15 L32 24 Z" fill="none" stroke="#f4f5f6" stroke-width="2" stroke-linejoin="round"/><circle cx="15" cy="25" r="3" fill="#f4f5f6"/><circle cx="25" cy="25" r="3" fill="#f4f5f6"/></svg>
+          <div class="hw-logo-text">VELOCITY<b>.</b></div>
+        </div>
+        <div class="hw-foot-about">
+          <p>Premium metal die-cast replicas for collectors who accept nothing less than precision. 100% authentic, worldwide shipped.</p>
+          <div class="hw-pay-icons">
+            <span>Visa</span><span>Mastercard</span><span>PayPal</span><span>eSewa</span><span>Khalti</span><span>Fonepay</span><span>COD</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-2 col-md-6 hw-foot-col">
+        <h4>Shop</h4>
+        <a href="{% url 'shop' %}">All Models</a>
+        <a href="{% url 'shop' %}?sort=new">New Arrivals</a>
+        <a href="{% url 'shop' %}?sort=best">Best Sellers</a>
+        <a href="{% url 'shop' %}?category=limited-edition">Limited Editions</a>
+        <a href="{% url 'shop' %}?sort=sale">Offers & Discounts</a>
+      </div>
+      <div class="col-lg-2 col-md-6 hw-foot-col">
+        <h4>Support</h4>
+        <a href="{% url 'help' %}">Help Center</a>
+        <a href="{% url 'faq' %}">FAQs</a>
+        <a href="{% url 'shipping_info' %}">Shipping Info</a>
+        <a href="{% url 'returns_policy' %}">Returns & Refunds</a>
+        <a href="{% url 'track_order' %}">Track Order</a>
+      </div>
+      <div class="col-lg-2 col-md-6 hw-foot-col">
+        <h4>Company</h4>
+        <a href="{% url 'about' %}">About Us</a>
+        <a href="{% url 'contact' %}">Contact Us</a>
+        <a href="{% url 'blog' %}">Blog</a>
+      </div>
+      <div class="col-lg-2 col-md-6 hw-foot-col">
+        <h4>Legal</h4>
+        <a href="{% url 'privacy_policy' %}">Privacy Policy</a>
+        <a href="{% url 'terms' %}">Terms & Conditions</a>
+        <a href="{% url 'returns_policy' %}">Return Policy</a>
+      </div>
+    </div>
+    <div class="hw-foot-bottom">
+      <span>&copy; 2026 Velocity Die-Cast Co. All rights reserved.</span>
+      <span>
+        <a href="{% url 'privacy_policy' %}">Privacy</a>
+        <a href="{% url 'terms' %}">Terms</a>
+        <a href="{% url 'faq' %}">FAQs</a>
+      </span>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+{% block js %}{% endblock %}
+</body>
+</html>

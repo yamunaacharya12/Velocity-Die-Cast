@@ -1,0 +1,42 @@
+{% extends 'website/layout.html' %}
+{% block title %}My Account — Velocity Die-Cast{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="hw-crumb"><a href="{% url 'home' %}">Home</a><span class="sep">/</span><span class="cur">My Account</span></div>
+  <h1 class="hw-page-title">My Account</h1>
+
+  <div class="row g-4">
+    <div class="col-lg-3">
+      <div class="hw-account-nav">
+        <a href="{% url 'dashboard' %}" class="active">Profile</a>
+        <a href="{% url 'order_history' %}">Order History</a>
+        <a href="{% url 'track_order' %}">Track Order</a>
+        <a href="{% url 'wishlist' %}">Wishlist</a>
+        <a href="{% url 'logout' %}">Sign Out</a>
+      </div>
+    </div>
+    <div class="col-lg-9">
+      <div class="hw-form-section">
+        <h4>Profile Details</h4>
+        <form method="post">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-md-6 hw-field"><label>First Name</label><input name="first_name" value="{{ request.user.first_name }}"></div>
+            <div class="col-md-6 hw-field"><label>Last Name</label><input name="last_name" value="{{ request.user.last_name }}"></div>
+          </div>
+          <div class="hw-field mt-3"><label>Email</label><input value="{{ request.user.email }}" disabled></div>
+          <div class="hw-field mt-3"><label>Phone</label><input name="phone" value="{{ profile.phone }}" placeholder="+977 98XXXXXXXX"></div>
+          <div class="hw-field mt-3"><label>Address</label><input name="address" value="{{ profile.address }}"></div>
+          <div class="row g-3 mt-1">
+            <div class="col-md-4 hw-field"><label>City</label><input name="city" value="{{ profile.city }}"></div>
+            <div class="col-md-4 hw-field"><label>State</label><input name="state" value="{{ profile.state }}"></div>
+            <div class="col-md-4 hw-field"><label>ZIP</label><input name="zip_code" value="{{ profile.zip_code }}"></div>
+          </div>
+          <button type="submit" class="hw-btn hw-btn-primary hw-btn-sm mt-4">Save Changes</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

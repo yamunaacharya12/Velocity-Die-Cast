@@ -1,0 +1,167 @@
+{% extends 'website/layout.html' %}
+{% load static product_extras %}
+
+{% block title %}Velocity Die-Cast — Premium Collector Cars{% endblock %}
+
+{% block content %}
+
+<section class="hw-hero hw-asphalt">
+  <div class="container hw-hero-inner">
+    <div class="row align-items-center">
+      <div class="col-lg-6">
+        <div class="hw-eyebrow">Est. Track Division &middot; Precision Scale Models</div>
+        <h1>Own the <em>legend.</em><br>Shelf-ready.</h1>
+        <p class="hw-lead">Museum-grade metal die-cast replicas of the world's most iconic supercars, hypercars, and racing legends — engineered to 1:64 precision, finished by hand.</p>
+        <div class="d-flex gap-3 flex-wrap">
+          <a href="{% url 'shop' %}" class="hw-btn hw-btn-primary">Shop The Garage</a>
+          <a href="{% url 'shop' %}?category=limited-edition" class="hw-btn hw-btn-outline">Limited Drops &rarr;</a>
+        </div>
+        <div class="hw-hero-stats">
+          <div class="hw-hero-stat"><b>{{ product_count|default:"420+" }}</b><span>Models In Stock</span></div>
+          <div class="hw-hero-stat"><b>{{ brands|length }}+</b><span>Licensed Brands</span></div>
+          <div class="hw-hero-stat"><b>4.9<span style="color:var(--yellow)">&#9733;</span></b><span>Collector Reviews</span></div>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="hw-hero-visual">
+          <div class="ring"></div><div class="ring r2"></div>
+          <div class="hw-speed-badge">0&ndash;60<b>2.4s</b></div>
+          {% if hero_product.image %}
+            <img src="{{ hero_product.image.url }}" alt="{{ hero_product.name }}" style="max-width:440px; border-radius:6px; box-shadow:0 30px 50px rgba(0,0,0,0.6); position:relative; z-index:2;">
+          {% else %}
+            {% car_svg hero_product 0 %}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="hw-checker"></div>
+</section>
+
+<div class="hw-brandstrip">
+  <div class="container d-flex justify-content-between flex-wrap gap-3">
+    {% for brand in brands %}
+      <a href="{% url 'shop' %}?brand={{ brand.slug }}">{{ brand.name|upper }}</a>
+    {% endfor %}
+  </div>
+</div>
+
+<section class="hw-section">
+  <div class="container">
+    <div class="hw-section-head">
+      <div><div class="hw-eyebrow">Fresh Off The Line</div><h2>Trending This Week</h2></div>
+      <a class="hw-viewall" href="{% url 'shop' %}?sort=trending">View All Models &rarr;</a>
+    </div>
+    <div class="row g-4">
+      {% for product in trending %}
+        <div class="col-lg-3 col-md-6">
+          {% include 'website/_product_card.html' %}
+        </div>
+      {% empty %}
+        <p class="text-center" style="color:var(--silver-dim);">No products yet — add some from the admin panel.</p>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="hw-section" style="padding-top:0;">
+  <div class="container">
+    <div class="hw-section-head">
+      <div><div class="hw-eyebrow">Browse By Marque</div><h2>Shop Categories</h2></div>
+    </div>
+    <div class="row g-3">
+      {% for cat in categories %}
+        <div class="col-6 col-sm-4 col-md-3 col-lg-2" style="flex:0 0 14.28%; max-width:14.28%;">
+          <a href="{{ cat.get_absolute_url }}" class="hw-cat-card">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 18h16M6 18l3-9h6l3 9"/><circle cx="8.5" cy="18" r="1.6" fill="currentColor" stroke="none"/><circle cx="15.5" cy="18" r="1.6" fill="currentColor" stroke="none"/></svg>
+            <span>{{ cat.name }}</span>
+            <small>{{ cat.products.count }} MODELS</small>
+          </a>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="hw-section" style="padding-top:0;">
+  <div class="container">
+    <div class="row g-0" style="border:1px solid var(--line);">
+      <div class="col-md-6 hw-offer-side red">
+        <div class="hw-eyebrow">Limited Time</div>
+        <h3>Up to 30% off<br>Hypercar Series</h3>
+        <p>Chrome and satin finishes across our hypercar collector line. While supplies last.</p>
+        <a href="{% url 'shop' %}?sort=sale" class="hw-btn" style="background:#fff;color:#111;">Shop The Sale</a>
+      </div>
+      <div class="col-md-6 hw-offer-side blue">
+        <div class="hw-eyebrow">Just Landed</div>
+        <h3>New Arrivals<br>Every Friday</h3>
+        <p>Fresh castings drop weekly — join thousands of collectors who never miss a release.</p>
+        <a href="{% url 'shop' %}?sort=new" class="hw-btn" style="background:#fff;color:#111;">See New Arrivals</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="hw-section">
+  <div class="container">
+    <div class="hw-section-head">
+      <div><div class="hw-eyebrow">Handpicked</div><h2>Featured Collection</h2></div>
+      <a class="hw-viewall" href="{% url 'shop' %}">Full Catalog &rarr;</a>
+    </div>
+    <div class="row g-4">
+      {% for product in featured %}
+        <div class="col-lg-3 col-md-6">
+          {% include 'website/_product_card.html' %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="hw-section" style="padding-top:0;">
+  <div class="container">
+    <div class="hw-section-head">
+      <div><div class="hw-eyebrow">Verified Buyers</div><h2>What Collectors Say</h2></div>
+    </div>
+    <div class="row g-4">
+      {% for review in reviews %}
+        <div class="col-md-4">
+          <div class="hw-rev-card">
+            <div class="hw-rev-stars">
+              {% for s in review.rating|star_range %}&#9733;{% endfor %}{% for s in review.rating|empty_star_range %}&#9734;{% endfor %}
+            </div>
+            <div class="hw-rev-text">&ldquo;{{ review.comment }}&rdquo;</div>
+            <div class="hw-rev-user">
+              <div class="hw-rev-avatar">{{ review.name|first|upper }}</div>
+              <div><div class="hw-rev-name">{{ review.name }}</div><div class="hw-rev-meta">{{ review.product.name }}</div></div>
+            </div>
+          </div>
+        </div>
+      {% empty %}
+        <p class="text-center" style="color:var(--silver-dim);">No reviews yet — be the first to leave one on a product page.</p>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="hw-section" style="padding-top:0;">
+  <div class="container">
+    <div class="hw-section-head"><div><div class="hw-eyebrow">Why Velocity</div><h2>Built For Collectors</h2></div></div>
+    <div class="row g-0" style="border:1px solid var(--line);">
+      <div class="col-md-3 col-6" style="border-right:1px solid var(--line); border-bottom:1px solid var(--line);">
+        <div class="hw-svc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 12l2 2 4-4M12 21c-4-2-8-6-8-11a8 8 0 0 1 16 0c0 5-4 9-8 11z"/></svg><b>100% Authentic</b><span>Every model officially licensed and verified before it ships.</span></div>
+      </div>
+      <div class="col-md-3 col-6" style="border-right:1px solid var(--line); border-bottom:1px solid var(--line);">
+        <div class="hw-svc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20z"/></svg><b>Worldwide Shipping</b><span>Tracked delivery to over 120 countries.</span></div>
+      </div>
+      <div class="col-md-3 col-6" style="border-right:1px solid var(--line); border-bottom:1px solid var(--line);">
+        <div class="hw-svc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 10h16M4 10a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8z"/></svg><b>Secure Payments</b><span>Card, PayPal, eSewa, Khalti, Fonepay & COD.</span></div>
+      </div>
+      <div class="col-md-3 col-6" style="border-bottom:1px solid var(--line);">
+        <div class="hw-svc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v6h6"/></svg><b>Easy 30-Day Returns</b><span>Return unopened models within 30 days.</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

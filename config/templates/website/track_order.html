@@ -1,0 +1,46 @@
+{% extends 'website/layout.html' %}
+{% block title %}Track Your Order — Velocity Die-Cast{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="hw-crumb"><a href="{% url 'home' %}">Home</a><span class="sep">/</span><span class="cur">Track Order</span></div>
+  <h1 class="hw-page-title">Track Your Order</h1>
+
+  <div class="row">
+    <div class="col-lg-7">
+      <div class="hw-form-section">
+        <h4>Enter Order Number</h4>
+        <form method="post" class="d-flex gap-2 flex-wrap">
+          {% csrf_token %}
+          <input name="order_number" class="hw-field" style="flex:1;min-width:200px;background:var(--charcoal-2);border:1px solid var(--line);color:#fff;padding:11px 13px;" placeholder="VDC-000000" required>
+          <button type="submit" class="hw-btn hw-btn-primary">Track Package</button>
+        </form>
+
+        {% if order %}
+          <div class="mt-4">
+            <div class="hw-track-steps">
+              {% for step in "0123" %}
+                <div class="hw-track-step {% if forloop.counter0 <= order.status_step and order.status != 'cancelled' %}done{% endif %}">
+                  <div class="hw-track-dot">
+                    {% if forloop.counter0 <= order.status_step and order.status != 'cancelled' %}
+                      <svg width="14" height="14" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+                    {% endif %}
+                  </div>
+                  <span>{% if forloop.counter0 == 0 %}Confirmed{% elif forloop.counter0 == 1 %}Packed{% elif forloop.counter0 == 2 %}Shipped{% else %}Delivered{% endif %}</span>
+                </div>
+              {% endfor %}
+            </div>
+            <p style="color:var(--silver);font-size:13px;">
+              Order <b style="color:var(--white);">{{ order.order_number }}</b> is currently
+              <b style="color:var(--white);">{{ order.get_status_display }}</b>.
+              Estimated delivery: <b style="color:var(--white);">{{ order.estimated_delivery|date:"D, M j, Y" }}</b>.
+            </p>
+          </div>
+        {% elif searched %}
+          <p class="mt-4" style="color:var(--silver-dim);">No order found with that number. Double-check and try again.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

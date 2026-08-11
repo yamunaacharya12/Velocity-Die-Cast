@@ -1,0 +1,19 @@
+{% extends 'website/layout.html' %}
+{% block title %}Create Account — Velocity Die-Cast{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="hw-auth-box">
+    <h2>Join Velocity</h2>
+    <p class="sub">Create your free collector account</p>
+    <form method="post">
+      {% csrf_token %}
+      <div class="hw-field mb-3"><label>Full Name</label><input name="full_name" required placeholder="Alex Rivera"></div>
+      <div class="hw-field mb-3"><label>Email Address</label><input type="email" name="email" required placeholder="alex@email.com"></div>
+      <div class="hw-field mb-3"><label>Password</label><input type="password" name="password" required placeholder="At least 6 characters"></div>
+      <button type="submit" class="hw-btn hw-btn-primary hw-btn-block">Create Account</button>
+    </form>
+    <p class="hw-auth-switch">Already a member? <a href="{% url 'login' %}">Sign in</a></p>
+  </div>
+</div>
+{% endblock %}

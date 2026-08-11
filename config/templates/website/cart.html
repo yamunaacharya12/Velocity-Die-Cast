@@ -1,0 +1,60 @@
+{% extends 'website/layout.html' %}
+{% load product_extras %}
+{% block title %}Your Cart — Velocity Die-Cast{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="hw-crumb"><a href="{% url 'home' %}">Home</a><span class="sep">/</span><span class="cur">Shopping Cart</span></div>
+  <h1 class="hw-page-title">Your Cart</h1>
+
+  {% if not cart_items %}
+    <div class="hw-empty-state">
+      <p style="font-family:'Teko';font-size:26px;color:var(--white);">Your cart is empty</p>
+      <p style="margin:10px 0 20px;">Looks like you haven't added any die-cast models yet.</p>
+      <a href="{% url 'shop' %}" class="hw-btn hw-btn-primary">Continue Shopping</a>
+    </div>
+  {% else %}
+    <div class="row g-4">
+      <div class="col-lg-8">
+        {% for item in cart_items %}
+          <div class="hw-cart-item">
+            <div class="hw-cart-item-media">
+              {% if item.product.image %}<img src="{{ item.product.image.url }}" alt="">{% else %}{% car_svg item.product 0 %}{% endif %}
+            </div>
+            <div>
+              <a href="{{ item.product.get_absolute_url }}" class="hw-ci-title">{{ item.product.name }}</a>
+              <div class="hw-ci-meta">{{ item.product.brand.name }} &middot; {{ item.product.scale }} &middot; {{ item.product.material }}</div>
+              <form method="post" action="{% url 'remove_from_cart' item.product.id %}" class="mt-1">
+                {% csrf_token %}
+                <button type="submit" class="hw-ci-remove">Remove</button>
+              </form>
+            </div>
+            <form method="post" action="{% url 'update_cart' item.product.id %}" class="hw-qty-stepper" style="margin:0;">
+              {% csrf_token %}
+              <button type="submit" name="quantity" value="{{ item.quantity|add:'-1' }}">&minus;</button>
+              <input type="number" name="quantity" value="{{ item.quantity }}" class="hw-qty-val" style="border-left:1px solid var(--line);border-right:1px solid var(--line);" onchange="this.form.submit()">
+              <button type="submit" name="quantity" value="{{ item.quantity|add:'1' }}">+</button>
+            </form>
+            <div class="hw-ci-price">${{ item.product.price }}</div>
+            <div class="hw-ci-price">${{ item.total }}</div>
+          </div>
+        {% endfor %}
+        <div class="mt-4">
+          <a href="{% url 'shop' %}" class="hw-btn hw-btn-outline">&larr; Continue Shopping</a>
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="hw-summary-box">
+          <h4 style="font-family:'Teko';font-size:20px;margin-bottom:18px;">Order Summary</h4>
+          <div class="hw-summary-row"><span>Subtotal</span><span>${{ subtotal }}</span></div>
+          <div class="hw-summary-row"><span>Shipping</span><span>{% if shipping == 0 %}FREE{% else %}${{ shipping }}{% endif %}</span></div>
+          <div class="hw-summary-row"><span>Estimated Tax</span><span>${{ tax }}</span></div>
+          <div class="hw-summary-row total"><span>Total</span><span>${{ total_due }}</span></div>
+          <a href="{% url 'checkout' %}" class="hw-btn hw-btn-primary hw-btn-block mt-3">Proceed to Checkout &rarr;</a>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

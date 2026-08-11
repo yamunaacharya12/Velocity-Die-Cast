@@ -1,0 +1,107 @@
+{% extends 'website/layout.html' %}
+{% load product_extras %}
+{% block title %}Shop All Models — Velocity Die-Cast{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="hw-crumb"><a href="{% url 'home' %}">Home</a><span class="sep">/</span><span class="cur">Shop</span></div>
+
+  <div class="row">
+    <div class="col-lg-3 mb-4">
+      <aside class="hw-filter-box">
+        <h4>Filters</h4>
+        <form method="get" id="filterForm">
+          <input type="hidden" name="sort" value="{{ current.sort }}" id="sortHidden">
+          <div class="hw-filter-group">
+            <h4 style="font-size:13px;color:var(--silver-dim);">Category</h4>
+            <label class="hw-filter-opt"><input type="radio" name="category" value="" {% if not current.category %}checked{% endif %} onchange="this.form.submit()"> All Categories</label>
+            {% for cat in categories %}
+              <label class="hw-filter-opt"><input type="radio" name="category" value="{{ cat.slug }}" {% if current.category == cat.slug %}checked{% endif %} onchange="this.form.submit()"> {{ cat.name }} <span class="cnt">{{ cat.products.count }}</span></label>
+            {% endfor %}
+          </div>
+          <div class="hw-filter-group">
+            <h4 style="font-size:13px;color:var(--silver-dim);">Brand</h4>
+            <label class="hw-filter-opt"><input type="radio" name="brand" value="" {% if not current.brand %}checked{% endif %} onchange="this.form.submit()"> All Brands</label>
+            {% for b in brands %}
+              <label class="hw-filter-opt"><input type="radio" name="brand" value="{{ b.slug }}" {% if current.brand == b.slug %}checked{% endif %} onchange="this.form.submit()"> {{ b.name }}</label>
+            {% endfor %}
+          </div>
+          <div class="hw-filter-group">
+            <h4 style="font-size:13px;color:var(--silver-dim);">Scale</h4>
+            <div class="hw-chip-row">
+              <a href="?{% if current.category %}category={{ current.category }}&{% endif %}scale=" class="hw-chip {% if not current.scale %}active{% endif %}">All</a>
+              {% for value, label in scale_choices %}
+                <a href="?{% if current.category %}category={{ current.category }}&{% endif %}scale={{ value }}" class="hw-chip {% if current.scale == value %}active{% endif %}">{{ label }}</a>
+              {% endfor %}
+            </div>
+          </div>
+          <div class="hw-filter-group">
+            <h4 style="font-size:13px;color:var(--silver-dim);">Price Range</h4>
+            <div class="hw-chip-row">
+              <a href="?price=0-15" class="hw-chip {% if current.price == '0-15' %}active{% endif %}">Under $15</a>
+              <a href="?price=15-50" class="hw-chip {% if current.price == '15-50' %}active{% endif %}">$15&ndash;$50</a>
+              <a href="?price=50-150" class="hw-chip {% if current.price == '50-150' %}active{% endif %}">$50&ndash;$150</a>
+              <a href="?price=150-99999" class="hw-chip {% if current.price == '150-99999' %}active{% endif %}">$150+</a>
+            </div>
+          </div>
+          <div class="hw-filter-group">
+            <label class="hw-filter-opt"><input type="checkbox" name="in_stock" value="1" {% if current.in_stock %}checked{% endif %} onchange="this.form.submit()"> In Stock Only</label>
+          </div>
+        </form>
+        <a href="{% url 'shop' %}" class="hw-btn hw-btn-dark hw-btn-block hw-btn-sm">Reset Filters</a>
+      </aside>
+    </div>
+
+    <div class="col-lg-9">
+      <div class="hw-shop-toolbar">
+        <div class="hw-shop-count">{{ total_count }} model{{ total_count|pluralize }} found</div>
+        <form method="get" id="sortForm">
+          {% if current.category %}<input type="hidden" name="category" value="{{ current.category }}">{% endif %}
+          {% if current.brand %}<input type="hidden" name="brand" value="{{ current.brand }}">{% endif %}
+          {% if current.scale %}<input type="hidden" name="scale" value="{{ current.scale }}">{% endif %}
+          {% if current.price %}<input type="hidden" name="price" value="{{ current.price }}">{% endif %}
+          <select name="sort" onchange="this.form.submit()">
+            <option value="trending" {% if current.sort == 'trending' %}selected{% endif %}>Sort: Trending</option>
+            <option value="new" {% if current.sort == 'new' %}selected{% endif %}>Newest First</option>
+            <option value="priceLow" {% if current.sort == 'priceLow' %}selected{% endif %}>Price: Low to High</option>
+            <option value="priceHigh" {% if current.sort == 'priceHigh' %}selected{% endif %}>Price: High to Low</option>
+            <option value="best" {% if current.sort == 'best' %}selected{% endif %}>Best Sellers</option>
+            <option value="sale" {% if current.sort == 'sale' %}selected{% endif %}>On Sale</option>
+          </select>
+        </form>
+      </div>
+
+      <div class="row g-4">
+        {% for product in products %}
+          <div class="col-md-4">
+            {% include 'website/_product_card.html' %}
+          </div>
+        {% empty %}
+          <div class="col-12">
+            <div class="hw-empty-state">
+              <p style="font-family:'Teko';font-size:22px;color:var(--white);">No models match your filters</p>
+              <p>Try adjusting or <a href="{% url 'shop' %}" style="color:var(--red);">resetting your filters</a>.</p>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      {% if page_obj.paginator.num_pages > 1 %}
+      <nav class="mt-5">
+        <ul class="pagination justify-content-center">
+          {% if page_obj.has_previous %}
+            <li class="page-item"><a class="page-link" style="background:var(--charcoal);border-color:var(--line);color:var(--white);" href="?page={{ page_obj.previous_page_number }}">&laquo;</a></li>
+          {% endif %}
+          {% for num in page_obj.paginator.page_range %}
+            <li class="page-item"><a class="page-link" style="background:{% if num == page_obj.number %}var(--red){% else %}var(--charcoal){% endif %};border-color:var(--line);color:#fff;" href="?page={{ num }}">{{ num }}</a></li>
+          {% endfor %}
+          {% if page_obj.has_next %}
+            <li class="page-item"><a class="page-link" style="background:var(--charcoal);border-color:var(--line);color:var(--white);" href="?page={{ page_obj.next_page_number }}">&raquo;</a></li>
+          {% endif %}
+        </ul>
+      </nav>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
