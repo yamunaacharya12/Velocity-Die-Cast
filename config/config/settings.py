@@ -38,11 +38,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
     'product',
     'cart',
     'orders',
     'accounts',
     'pages',
+    'api',
 ]
 
 MIDDLEWARE = [
@@ -139,3 +141,12 @@ LOGOUT_REDIRECT_URL = 'home'
 FREE_SHIPPING_THRESHOLD = 100
 STANDARD_SHIPPING_COST = 9.99
 TAX_RATE = 0.08
+
+# ---- Django REST Framework ----
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 12,
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ],
+}
